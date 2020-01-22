@@ -1,0 +1,46 @@
+#include <kipr/botball.h>
+#define mov_win_stop 0
+thread move;
+
+const int mov_win_const[2]={30,100};
+float mov_win_avg;
+
+//void moving_win(int port, int length);
+void moving_win();
+int main()
+{
+    move = thread_create(moving_win);
+    thread_start(move);
+    while(1){
+        printf("%f\n",mov_win_avg);
+        msleep(50);
+        if(mov_win_avg<1400){break;}
+    }
+    return 0;
+        
+}
+//void moving_win(int port,int length){
+void moving_win(){
+    int port = 0;
+    int length = 100;
+    if(length < mov_win_const[0]){length=mov_win_const[0];}//if length is lower than min allowed, set to min
+    if(length > mov_win_const[1]){length=mov_win_const[1];}//if length is higher the max allowed, set to max
+    int pos,i;
+    float total,average,win[length];
+    while(1){
+        win[pos]=analog(port);
+        i=0;
+        total=0;
+        while(i<length){
+            total=total+win[i];
+            i++;
+        }
+        average=total/length;
+        if(digital(9)==1){
+            break;
+        }
+        pos++;
+        if(pos>=length){pos=0;}//reset pos when it reaches length
+        mov_win_avg=average;//"return" the average of the total stored data
+    }
+}
