@@ -51,16 +51,3 @@ void kf_threads(){
     if(a_filter_ports[4]){thread_destroy(af_four);}
     if(a_filter_ports[5]){thread_destroy(af_five);}
 }
-int main()
-{
-    csf_threads();
-    //
-    msleep(2000);
-    while(left_button() != 1){
-    printf("%f\n", filter_out[3]) ;
-    msleep(5);}
-
-    //
-    kf_threads();
-    return 0;
-}
