@@ -1,0 +1,1 @@
+void servo(int port, int position, int speed);

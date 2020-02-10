@@ -1,26 +1,23 @@
-#include <kipr/botball.h>
+#include <kipr/wombat.h>
+#include <math.h>
 #include <create_functions.h>
 #include <create_comp_lib.h>
-
+#include <trey.h>
+#include <alissa.h>
+#include <camera.h>
 int main()
 {
-    create_connect();
-    slow_arm(arm_start,5);
-    slow_hand(closed,60);
-    slow_base(back);
-    while(right_button() != 1){}
-    start_position();
-    create_stop();
-    msleep(3000);//waitforlight
-    create_stop();
-	towards_firetruck();
-    at_firetruck();
-    transport_firetruck();
-	corner_waters();
-   	firefighter_in_burning();
-	grabbing_packages();
-    
-      
-    create_disconnect();
+ /*initialize();
+ create_connect();
+gyro_calibrate();
+calibrate_gyro();*/
+ /*msleep(50);
+ create_drive_direct(50,50);
+ while(where(yellow)<40)
+     create_stop();
+ printf("%d", where(yellow));*/
+    alissa();
+    //trey();
+ //create_disconnect();
    return 0; 
-}    
+}   
