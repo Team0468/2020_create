@@ -1,5 +1,8 @@
-#include <kipr/botball.h>
+#include <kipr/wombat.h>
+#include <math.h>
+#include <create_functions.h>
 #include <create_comp_lib.h>
+#include <alissa.h>
 
 #define right_motor 0
 #define left_motor 1
@@ -22,105 +25,14 @@ int target_theta_m180 = target_theta_180;
 #define cliff 2000
 
 #define hat 0
-
 int turn = 150; // was 110
 int square = 175; // was 200
 int PID = 150; // was 150
-
-void move(l_speed,r_speed){
-    mav(right_motor,r_speed);
-    mav(left_motor,l_speed);
-}
-
 int white = 1;
 int black = 2;
 int physical = 3;
 int black_speed;
-void square_up(int ending,int speed){
-    if(speed > 0 && speed < 600){
-        black_speed = 0.5*speed;
-    }
-    else{black_speed = 0.25*speed;}
-    if(ending == 1 || ending == 2){
-        while(1){
-            if(analog(left_IR)<analog_white && analog(right_IR)<analog_white){
-                move(speed,speed);
-            }
-            if(analog(right_IR)>analog_white){
-                move(speed,stop);
-            }
-            if(analog(left_IR)>analog_white){
-                move(stop,speed);
-            }
-            if(analog(left_IR)>analog_white && analog(right_IR)>analog_white) {
-                move(stop,stop);
-                break;
-            }
-        }
-    }
-    if(ending == 3){
-        ao();
-    }
-    switch(ending){
-        case 3:
-            {
-                while(1){
-                    if(digital(digital_right)==0 && digital(digital_left)==0){
-                        move(speed,speed);
-                    }
-                    if(digital(digital_right)==1){
-                        move(speed,stop);
-                    }
-                    if(digital(digital_left)==1){
-                        move(stop,speed);
-                    }
-                    if(digital(digital_right)==1 && digital(digital_left)==1){
-                        move(stop,stop);
-                        break;
-                    }
-                }
-            }
-        case 1:
-            {
-                while(1){
-                    if(analog(left_IR)>analog_white && analog(right_IR)>analog_white){
-                        move(black_speed,black_speed);
-                    }
-                    if(analog(left_IR)<analog_white){
-                        move(stop,black_speed);
-                    }
-                    if(analog(right_IR)<analog_white){
-                        move(black_speed,stop);
-                    }
-                    if(analog(left_IR)<analog_white && analog(right_IR)<analog_white){
-                        move(stop,stop);
-                        break;
-                    }
-                }
-            }
-        case 2:
-            {
-                while(1){
-                    if(analog(left_IR)>analog_white && analog(right_IR)>analog_white){
-                        move(-1*black_speed,-1*black_speed);
-                    }
-                    if(analog(left_IR)<analog_white){
-                        move(stop,-1*black_speed);
-                    }
-                    if(analog(right_IR)<analog_white){
-                        move(-1*black_speed,stop);
-                    }
-                    if(analog(left_IR)<analog_white && analog(right_IR)<analog_white){
-                        move(stop,stop);
-                        break;
-                    }
-                }
-            }
-    }
-}
-
 double bias = 0.0;
-
 double calibrate_gyro(){
     int i = 0;
     double avg = 0;
@@ -133,46 +45,6 @@ double calibrate_gyro(){
     bias = avg / 50.0;
     printf("New Bias: %f\n", bias);
     return bias;
-}
-
-void drive_with_gyro(int speed, double time){
-    double startTime = seconds();
-    double theta = 0;
-    while(seconds() - startTime < time){
-        if (theta < 1000 && theta > -1000){
-            mav(right_motor, speed);
-            mav(left_motor, speed);
-        }
-        else if (theta < 1000){
-            mav(right_motor, speed + 100);
-            mav(left_motor, speed - 100);
-        }
-        else{
-            mav(right_motor, speed - 100);
-            mav(left_motor, speed + 100);
-        }
-        msleep(10);
-        theta += (gyro_z() - bias) * 10;
-        printf("%f",theta);
-    }
-}
-
-void PID_gyro_drive(int speed, double time){
-    double startTime = seconds();
-    double theta = 0;
-    while((seconds() - startTime) < time){
-        if(speed > 0){
-            mav(right_motor, (speed - (speed * (theta/100000))));            
-            mav(left_motor, (speed + (speed * theta/100000)));
-        }
-
-        else{
-            mav(left_motor, (speed + (speed * theta/100000)));            
-            mav(right_motor, (speed - (speed * (theta/100000))));
-        }
-        msleep(10);
-        theta += (gyro_z() - bias) * 10;
-    }
 }
 
 void turn_with_gyro_create(int speed, int deg){
@@ -207,10 +79,6 @@ void turn_with_gyro_create(int speed, int deg){
             targetTheta = target_theta_01;
             create_drive_direct(speed,speed*-1);
             break;
-        /*case 02:
-            targetTheta = target_theta_02;
-            create_drive_direct(speed,-speed);
-            break;*/
         default:
             targetTheta = 0;
             break;
@@ -221,48 +89,6 @@ void turn_with_gyro_create(int speed, int deg){
         printf("Turn Gyro Z: %d\n",gyro_z());
     }
     create_drive_direct(0,0);
-}
-
-
-void turn_with_gyro(int speed, int deg){
-    double theta = 0;
-    int targetTheta; 
-    switch(deg){
-        case 45:
-            targetTheta = target_theta_45;
-            move(speed,speed*-1);
-            break;
-        case 90:
-            targetTheta = target_theta_90;
-            move(speed,speed*-1);
-            break;
-        case 180:
-            targetTheta = target_theta_180;
-            move(speed,speed*-1);
-            break;
-        case -45:
-            targetTheta = target_theta_m45;
-            move(speed*-1,speed);
-            break;
-        case -90:
-            targetTheta = target_theta_m90;
-            move(speed*-1,speed);
-            break;
-        case -180:
-            targetTheta = target_theta_m180;
-            move(speed*-1,speed);
-            break;
-        default:
-            targetTheta = 0;
-            break;
-    }  
-    while(theta < targetTheta){
-        msleep(10);
-        theta += abs(gyro_z() - bias) * 10;
-        printf("Turn Gyro Z: %d\n",gyro_z());
-    }
-    mav(right_motor, 0);
-    mav(right_motor, 0);
 }
 
 void PID_gyro_drive_create(int speed, double time){
@@ -276,7 +102,7 @@ void PID_gyro_drive_create(int speed, double time){
             create_drive_direct((speed - (speed * theta/100000)), (speed + (speed * theta/100000)));
         }
         msleep(15);
-        theta += (gyro_z() - bias) * 10;
+        theta += (gyro_z() - bias) * 10;  //was gyro_z()
     }
     create_stop();
 }
@@ -513,17 +339,6 @@ void back_til_black(){
     create_stop();
 }
 
-/*void one_wheel_turn(int speed){
-    double theta = 0;
-    int targetTheta = target_theta_90;      // altering this function for a more precise 90 degree turn.
-    create_drive_direct(0,speed*-1);
-    while(theta < targetTheta){
-        msleep(10);
-        theta += abs(gyro_z() - bias) * 10;
-    }
-    create_drive_direct(0,0);
-}*/
-
 void one_wheel_turn(int speed){
     double theta = 0;
     int targetTheta = target_theta_02;
@@ -550,4 +365,46 @@ void triple_square(){
     turn_with_gyro_create(250,-90);
     short_pause(); short_pause();
     square_up_back_create(black,250);
+}
+
+void straight_distance(int distance)
+{
+    int start_time = seconds();
+    int base_speed = 200;
+    create_drive_straight(base_speed);
+    	msleep((distance/base_speed)*1000);
+    int total_loop_time = seconds()-start_time;
+    create_stop();
+    printf("%d", total_loop_time)
+}
+
+void turn_create(int deg)
+{
+    int speed = 200;
+	switch(deg){
+        case 45:
+            create_spin_CW(speed);
+            msleep(475);
+            break;
+        case 90:
+            create_spin_CW(speed);
+            msleep(930);
+            break;
+        case 180:
+            create_spin_CW(speed);
+            msleep(1875);
+            break;
+        case -45:
+            create_spin_CCW(speed);
+            msleep(475);
+            break;
+        case -90:
+            create_spin_CCW(speed);
+            msleep(930);
+            break;
+        case -180:
+            create_spin_CCW(speed);
+            msleep(1875);
+            break;
+    }  
 }
