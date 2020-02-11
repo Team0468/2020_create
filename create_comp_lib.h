@@ -26,5 +26,5 @@ void short_pause();
 void triple_square();
 void square_up_lblack_rwhite_create();
 void square_up_rblack_lwhite_create();
-void straight_distance(int distance);
+void straight_distance(double distance);
 void turn_create(int deg);
