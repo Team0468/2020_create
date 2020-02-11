@@ -367,15 +367,28 @@ void triple_square(){
     square_up_back_create(black,250);
 }
 
-void straight_distance(int distance)
+void straight_distance(double distance)
 {
-    int start_time = seconds();
-    int base_speed = 200;
+    double base_speed = 200;
+    
+    if(distance > 0)
+    {
     create_drive_straight(base_speed);
-    	msleep((distance/base_speed)*1000);
-    int total_loop_time = seconds()-start_time;
+        double mathh = distance/base_speed;
+    	msleep(mathh*1000);
     create_stop();
-    printf("%d", total_loop_time)
+    msleep(16);
+    }
+    
+    if(distance < 0)
+    {
+    base_speed = -200;
+    create_drive_straight(base_speed);
+    	double mathh = distance/base_speed;
+    	msleep(mathh*1000);
+    create_stop();
+    msleep(16);
+    }
 }
 
 void turn_create(int deg)
