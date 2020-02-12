@@ -1,3 +1,4 @@
+#include <kipr/botball.h>
 thread af_zero,af_one,af_two,af_three,af_three,af_four,af_five;
 int filt_distribute=0;
 float filter_out[6];
