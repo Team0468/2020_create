@@ -1,9 +1,9 @@
-#include <kipr/wombat.h>
+#include <kipr/botball.h>
 #include <math.h>
 #include <create_functions.h>
 #include <create_comp_lib.h>
 #include <alissa.h>
-
+int normal = 300;
 int back = front - 1200;
 int half = front - 700;
 int open = closed + 1647;
@@ -11,6 +11,8 @@ int tight = closed - 200;
 int small_open = closed + 1200;
 int tightish = closed - 125;
 int ajar = closed + 800;
+int sET = 1;
+int cET = 2;
 
 void slow_arm02 (int x )//this funtion slows 
 { 

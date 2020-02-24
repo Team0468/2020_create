@@ -1,10 +1,12 @@
-#include <kipr/wombat.h>
+#include <kipr/botball.h>
 #include <math.h>
 #include <create_functions.h>
 #include <create_comp_lib.h>
 #include <trey.h>
 #include <alissa.h>
 #include <camera.h>
+long area_close=2139607924;
+long area_far=2128616692;//less than area_close by 10,991,232
 int camera_initialize(){
     camera_open_black();
     int a=0;
@@ -63,7 +65,7 @@ int yellow_camera(int color){
     while(yb1<1){   
         camera_update();
         if(get_object_count(color)>0){
-            if(get_object_center_x(color,0)<81 || get_object_area(color,0) < 160 ){yb1=0; }
+            if(get_object_center_x(color,0)<81 || get_object_area(color,0) >= area_far ){yb1=0; }
         	else{
                 yb1=1;
                 break;
@@ -74,3 +76,4 @@ int yellow_camera(int color){
     create_stop();
     return 0;
 }
+

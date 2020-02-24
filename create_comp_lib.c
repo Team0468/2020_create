@@ -1,14 +1,16 @@
-#include <kipr/wombat.h>
+#include <kipr/botball.h>
 #include <math.h>
 #include <create_functions.h>
 #include <create_comp_lib.h>
 #include <alissa.h>
+#include <filter.h>
+#include <timer.h>
 
 #define right_motor 0
 #define left_motor 1
-#define target_theta_45 291000
-#define target_theta_90 512500 // WORKING ON NUMBERS FOR 3999 // was 500500
-#define target_theta_180 1250000 // ALL NUMBERS SHOULD BE GOOD
+#define target_theta_45 245290
+#define target_theta_90 525500 // WORKING ON NUMBERS FOR 3999 // was 500500 //was 512500
+#define target_theta_180 1073500 // ALL NUMBERS SHOULD BE GOOD
 #define target_theta_01 25000
 #define target_theta_02 557500
 int target_theta_m45 = target_theta_45;
@@ -103,6 +105,7 @@ void PID_gyro_drive_create(int speed, double time){
         }
         msleep(15);
         theta += (gyro_z() - bias) * 10;  //was gyro_z()
+        printf("%f",(seconds() - startTime));
     }
     create_stop();
 }
@@ -171,14 +174,29 @@ void square_up_front_create(int ending,int speed){
     }
 }
 
-void linefollow_create(int time, int speed){
-    double startTime = seconds();
-    while(startTime < time){
-        if(get_create_rfcliff_amt()<cliff){
-            create_drive_direct((3*speed)/4,speed);
+void linefollow_create(double time, int speed, int side){
+    if(side == right){
+        timer_reset(1);
+        while(time_calc(1) < time){
+            if(get_create_rfcliff_amt()<cliff){
+                create_drive_direct((3*speed)/4,speed);
+            }
+            if(get_create_rfcliff_amt()>cliff){
+                create_drive_direct(speed,(3*speed)/4);
+            }
+            time_calc(1);
         }
-        if(get_create_rfcliff_amt()>cliff){
-            create_drive_direct(speed,(3*speed)/4);
+    }
+    if(side == left){
+        timer_reset(1);
+        while(time_calc(1) < time){
+            if(get_create_lfcliff_amt()<cliff){
+                create_drive_direct(speed,(3*speed)/4); 
+            }
+            if(get_create_lfcliff_amt()>cliff){
+                create_drive_direct((3*speed)/4,speed);
+            }
+            time_calc(1);
         }
     }
 }
@@ -300,14 +318,27 @@ void reach_material(){
 
 void create_line_follow(int dist){
     set_create_distance(0);
-    while (get_create_distance() < dist){
-        if(get_create_lfcliff_amt() > 1600){
-            create_drive_direct(166,250);
+    if(dist > 0){
+        while (get_create_distance() < dist){
+            if(get_create_lfcliff_amt() > 1600){
+                create_drive_direct(166,250);
+            }
+            else{
+                create_drive_direct(250,166);
+            }
+            msleep(15);
         }
-        else{
-            create_drive_direct(250,166);
+    }
+    if(dist > 0){
+        while (get_create_distance() < dist){
+            if(get_create_lfcliff_amt() > 1600){
+                create_drive_direct(-250,-166); 
+            }
+            else{
+                create_drive_direct(-166,-250); 
+            }
+            msleep(15);
         }
-        msleep(15);
     }
 }
 
@@ -329,7 +360,7 @@ void create_line_follow_materials(){
 
 void bang(){
     create_drive_direct(250,250);
-    while(get_create_lbump()==0 && get_create_rbump()==0){}
+    while(get_create_lbump()==0 && get_create_rbump()==0){msleep(15);}
     create_stop();
 }
 
@@ -367,34 +398,20 @@ void triple_square(){
     square_up_back_create(black,250);
 }
 
-void straight_distance(double distance)
+void straight_distance(double distance, double base_speed)
 {
-    double base_speed = 200;
-    
-    if(distance > 0)
-    {
     create_drive_straight(base_speed);
-        double mathh = distance/base_speed;
-    	msleep(mathh*1000);
+    double mathh = distance/abs(base_speed);
+    msleep(mathh*1000);
     create_stop();
     msleep(16);
-    }
-    
-    if(distance < 0)
-    {
-    base_speed = -200;
-    create_drive_straight(base_speed);
-    	double mathh = distance/base_speed;
-    	msleep(mathh*1000);
-    create_stop();
-    msleep(16);
-    }
 }
+
 
 void turn_create(int deg)
 {
     int speed = 200;
-	switch(deg){
+    switch(deg){
         case 45:
             create_spin_CW(speed);
             msleep(475);
@@ -420,4 +437,19 @@ void turn_create(int deg)
             msleep(1875);
             break;
     }  
+}
+void PID_gyro_drive_create_et(int speed, int buff){ //uses a distance sensor to drive straight
+    double theta = 0;
+    while (buffer(cET)<buff){
+        if (speed > 0){
+            create_drive_direct((speed + (speed * theta/100000)),(speed - (speed * theta/100000)));
+        }
+        else{
+            create_drive_direct((speed - (speed * theta/100000)), (speed + (speed * theta/100000)));
+        }
+        if (get_create_lbump()==1 || get_create_rbump()==1){break;}//insurance
+        msleep(12);
+        theta += (gyro_z() - bias) * 10;  //was gyro_z()
+    }
+    create_stop();
 }

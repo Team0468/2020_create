@@ -1,4 +1,4 @@
-#include <kipr/wombat.h>
+#include <kipr/botball.h>
 #include <camera.h>
 int initialize(){
     camera_open_black();

@@ -1,7 +1,22 @@
-int trey_start;
+
+int cube_stack1;
+int cube_stack2;
+int top_cube;
+int low_cubes;
 int smol_cubes;
 int stack_hand;
-int stack_arm;
+int unstack_hand;
+int over_block;
+int squeeze;
+int release;
+int base_up;
+int chain_grab;
+int chain_arm;
+
+double correction_saywad;
+double increase_tot;
 
 int trey();
-int first_cubes();
+int med_cubes();
+int first_cube();
+int four_cubes();

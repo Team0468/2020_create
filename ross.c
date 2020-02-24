@@ -1,4 +1,4 @@
-#include <kipr/wombat.h>
+#include <kipr/botball.h>
 
 int base = 0;   // Replace variables to match your robot.
 //int dozer = 1;  // Else define at top of library.
