@@ -17,3 +17,5 @@ int camera_center(int color);
 int block_check();
 int yellow_camera(int color);
 int i;
+long area_close;
+long area_far;

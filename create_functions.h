@@ -1,12 +1,13 @@
 #define down 2000
-#define front 1850
+#define front 1600
 #define closed 200
 #define out 125
 #define max 1500
 #define hand 3
-#define arm 1
+#define arm 2
+int normal;
 #define base 0
-#define arm_max 2000
+#define arm_max 1980 //1980
 #define arm_min 0
 #define arm_mid 600
 #define hand_max 2047 //also start
@@ -34,6 +35,8 @@ int ajar;
 int turn;
 int PID;
 int square;
+int sET;
+int cET;
 void slow_arm02 (int x );//this funtion slows 
 void slow_arm (int x,int speed);//this funtion slows
 void slow_hand ( int z, int speed );//this funtion slows 

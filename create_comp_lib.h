@@ -13,7 +13,7 @@ void turn_with_gyro_create(int speed, int deg);
 void turn_with_gyro(int speed, int deg);
 void PID_gyro_drive_create(int speed, double time);
 void square_up_front_create(int ending,int speed);
-void linefollow_create(int time, int speed); //time in miliseconds (must have create_stop(); right after)
+void linefollow_create(double time, int speed, int side); //time in seconds (must have create_stop(); right after)
 void square_up_back_create(int ending,int speed);
 void turn_90();
 void reach_material();
@@ -26,5 +26,6 @@ void short_pause();
 void triple_square();
 void square_up_lblack_rwhite_create();
 void square_up_rblack_lwhite_create();
-void straight_distance(double distance);
+void straight_distance(double distance, double base_speed);
 void turn_create(int deg);
+void PID_gyro_drive_create_et(int speed, int buff);
